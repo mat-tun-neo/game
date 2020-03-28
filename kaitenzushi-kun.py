@@ -1,25 +1,31 @@
 from pygame_functions import *
+from random import random
 
 SCREEN_X = 1200
 SCREEN_Y = 600
 PLAYER_ALLIMAGE = 27
-PLAYER_MOVELEN = 12
+PLAYER_MOVELEN = 16
 PLAYER_WIDTH = 192
 PLAYER_HEIGHT = 160
 PLAYER_SCALE = 1.5
-DISH_ALLIMAGE = 3
+GROUND = 380 - PLAYER_HEIGHT * PLAYER_SCALE - 20
+TOUCH_JUDGE = 30
+RAIL_Y = 312
 DISH_MOVELEN = 5
 DISH_WIDTH = 250
 DISH_HEIGHT = 113
 DISH_SCALE = 1.2
 DISH_NUM = 5
-DISH_INTERVAL = 2
-GROUND = 380 - PLAYER_HEIGHT * PLAYER_SCALE - 20
-TOUCH_JUDGE = 30
-RAIL_Y = 312
+DISH_APPEAR = 0.01
+DISH_VALUE = 100
+DISH_X = DISH_WIDTH * (-1)
 DISH_Y = RAIL_Y - DISH_HEIGHT / 3 + 10
+KAIKEI_KETA = 6
+KAIKEI_X = 500
+KAIKEI_Y = 0
+KAIKEI_WIDTH = 39
 
-screenSize(SCREEN_X, SCREEN_Y)
+screen = screenSize(SCREEN_X, SCREEN_Y)
 setBackgroundImage("images/bg_kaitenzushi.jpg")
 
 all_rails = []
@@ -36,7 +42,7 @@ for i in range(2):
 all_dishes = []
 for i in range(DISH_NUM):
     dish = makeSprite("images/dish" + format(i, '02') + ".png")
-    dish.x = i * SCREEN_X / DISH_INTERVAL * (-1) - DISH_WIDTH
+    dish.x = DISH_WIDTH * (-1)
     dish.y = DISH_Y
     moveSprite(dish, dish.x, dish.y)
     showSprite(dish)
@@ -50,15 +56,24 @@ player_x = SCREEN_X / 2
 transformSprite(player, 0, PLAYER_SCALE)
 moveSprite(player, player_x, GROUND)
 showSprite(player)
-
 left = False
 right = False
-score = 0
-scorelabel = makeLabel(str(score), 50, SCREEN_X / 3, 450, "black")
-showLabel(scorelabel)
+
+def kaikei(n):
+    j = 0
+    for i in range(KAIKEI_KETA):
+        if KAIKEI_KETA - len(str(n)) > i:
+            kaikei = makeImage("images/a.jpg")
+        else:
+            kaikei = makeImage("images/" + str(n)[j] + ".jpg")
+            j += 1
+        screen.blit(kaikei, (KAIKEI_X + KAIKEI_WIDTH * i, KAIKEI_Y))
 
 nextFrame = clock()
 playerImgNo = 0
+score = 0
+kaikei(score)
+dish_appearflg = 0
 
 while True:
     if not left and not right:
@@ -86,6 +101,7 @@ while True:
             else:
                 player_x += DISH_MOVELEN
             moveSprite(player, player_x, GROUND)
+            
     if right:
         if clock() > nextFrame:
             playerImgNo -= 1
@@ -116,20 +132,30 @@ while True:
             rail.x = SCREEN_X * (-1)
         moveSprite(rail, rail.x, RAIL_Y)
     
+    cnt = 1
     for dish in all_dishes:
-        dish.x += DISH_MOVELEN
-        if left and playerImgNo == 24 and touching(player, dish):
-            dish.y += 10
-            score += 1
-            changeLabel(scorelabel, str(score))
-        if dish.y > DISH_Y:
-            dish.y += 10
-        moveSprite(dish, dish.x, dish.y)
+        if dish_appearflg == 0 and dish.x == DISH_X and random() < DISH_APPEAR:
+            dish.x += DISH_MOVELEN
+            dish_appearflg = cnt
+        
+        if (left and playerImgNo == 24) and touching(player, dish):
+            dish.y += DISH_MOVELEN * 2
+        if SCREEN_Y > dish.y > DISH_Y:
+            dish.y += DISH_MOVELEN * 2
+        if dish.y > SCREEN_Y:
+            dish.y = SCREEN_Y
+            score += DISH_VALUE
+            kaikei(score)
         if dish.x > SCREEN_X:
-            dish.x = DISH_WIDTH * (-1)
-            if dish.y > SCREEN_Y:
-                dish.y = DISH_Y
-
+            dish.x = DISH_X
+            dish.y = DISH_Y
+        elif dish.x > DISH_X:     
+            moveSprite(dish, dish.x, dish.y)
+            dish.x += DISH_MOVELEN
+            if cnt == dish_appearflg and dish.x > 0:
+                dish_appearflg = 0
+        cnt += 1
+            
     tick(30)
 
 
