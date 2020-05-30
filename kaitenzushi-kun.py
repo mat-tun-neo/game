@@ -21,9 +21,6 @@ for i in range(2):
     showSprite(rail)
     all_rails.append(rail)
 
-# ループ初期値
-nextFrame = clock()
-
 # メインループ
 while True:
     # レールの描画
