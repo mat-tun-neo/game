@@ -61,7 +61,3 @@ while True:
         moveSprite(player, player_x, PLAYER_Y)
     
     tick(60)
-
-
-
-
