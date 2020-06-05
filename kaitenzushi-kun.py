@@ -23,9 +23,6 @@ showSprite(player)
 left = False
 right = False
 
-# ループ初期値
-nextFrame = clock()
-
 # メインループ
 while True:
     # プレイヤーの操作判定　（入力なし）
@@ -43,27 +40,25 @@ while True:
         
     # プレイヤーの操作判定　（入力：左キー）
     if left:
-        if clock() > nextFrame:
-            playerImgNo += 1
-            if playerImgNo > 26:
-                playerImgNo = 0
-                left = False
-            player_x -= PLAYER_MOVELEN * PLAYER_SCALE
-            if player_x < 0:
-                player_x = 0
-            moveSprite(player, player_x, PLAYER_Y)
+        playerImgNo += 1
+        if playerImgNo > 26:
+            playerImgNo = 0
+            left = False
+        player_x -= PLAYER_MOVELEN * PLAYER_SCALE
+        if player_x < 0:
+            player_x = 0
+        moveSprite(player, player_x, PLAYER_Y)
 
     # プレイヤーの操作判定　（入力：右キー）
     if right:
-        if clock() > nextFrame:
-            playerImgNo -= 1
-            if playerImgNo < 0:
-                playerImgNo = 0
-                right = False
-            player_x += PLAYER_MOVELEN * PLAYER_SCALE
-            if player_x > SCREEN_X - PLAYER_WIDTH * PLAYER_SCALE:
-                player_x = SCREEN_X - PLAYER_WIDTH * PLAYER_SCALE
-            moveSprite(player, player_x, PLAYER_Y)
+        playerImgNo -= 1
+        if playerImgNo < 0:
+            playerImgNo = 0
+            right = False
+        player_x += PLAYER_MOVELEN * PLAYER_SCALE
+        if player_x > SCREEN_X - PLAYER_WIDTH * PLAYER_SCALE:
+            player_x = SCREEN_X - PLAYER_WIDTH * PLAYER_SCALE
+        moveSprite(player, player_x, PLAYER_Y)
     
     tick(60)
 
